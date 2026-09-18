@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us — TerraBloom</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="glass-nav"><div class="container"><div class="bar">
+  <a href="index.html" class="brand"><span class="dot"></span>TerraBloom</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li><li><a href="menu.html">Menu</a></li><li><a href="about.html">About</a></li>
+    <li><a href="reservation.html">Reserve</a></li><li><a href="contact.html" class="active">Contact</a></li><li><a href="track-order.html">Track Order</a></li>
+  </ul>
+  <div class="nav-actions"><a href="login.html" class="icon-btn">👤</a><a href="cart.html" class="icon-btn">🛒<span class="cart-count">0</span></a>
+  <button class="menu-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div>
+</div></div></nav>
+
+<header class="page-hero">
+  <div class="container"><span class="eyebrow">Get in Touch</span><h1>We'd love to hear from you</h1><p class="muted">Questions, catering requests, or feedback — send us a note and we'll reply within one business day.</p></div>
+</header>
+
+<section class="section-tight">
+  <div class="container" style="display:grid;grid-template-columns:1fr 1.2fr;gap:40px;">
+    <div>
+      <div class="card" style="padding:26px;margin-bottom:20px;">
+        <h4 style="margin-top:0;">📍 Visit us</h4>
+        <p class="mb-0">412 Willow Street<br>Portland, OR 97201</p>
+      </div>
+      <div class="card" style="padding:26px;margin-bottom:20px;">
+        <h4 style="margin-top:0;">📞 Call or email</h4>
+        <p class="mb-0">+1 (555) 019-2044<br>hello@terrabloom.com</p>
+      </div>
+      <div class="card" style="padding:26px;">
+        <h4 style="margin-top:0;">🕐 Kitchen hours</h4>
+        <p class="mb-0">Mon–Fri: 8am – 9pm<br>Sat–Sun: 9am – 10pm</p>
+      </div>
+    </div>
+
+    <div class="card" style="padding:32px;">
+      <h4 style="margin-top:0;">Send a message</h4>
+      <form id="contact-form">
+        <div class="grid-2">
+          <div class="field"><label>Full name</label><input type="text" id="c-name" required></div>
+          <div class="field"><label>Email</label><input type="email" id="c-email" required></div>
+        </div>
+        <div class="field"><label>Subject</label>
+          <select id="c-subject"><option>General inquiry</option><option>Catering request</option><option>Order issue</option><option>Feedback</option></select>
+        </div>
+        <div class="field"><label>Message</label><textarea rows="5" id="c-message" required placeholder="Tell us how we can help…"></textarea></div>
+        <button type="submit" class="btn btn-primary btn-block" id="send-btn"><span class="btn-label">Send Message</span><span class="spinner"></span></button>
+        <p id="confirm-msg" class="hint" style="display:none;color:var(--sage);margin-top:12px;">✓ Thanks! Your message has been sent — we'll be in touch soon.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div><div class="brand" style="color:#fff;margin-bottom:12px;"><span class="dot"></span>TerraBloom</div><p style="color:var(--sage-pale);opacity:.8;font-size:.9rem;">Slow food, grown with intention.</p></div>
+      <div><h4>Explore</h4><ul style="display:flex;flex-direction:column;gap:10px;"><li><a href="menu.html">Menu</a></li><li><a href="about.html">About Us</a></li><li><a href="reservation.html">Reservation</a></li></ul></div>
+      <div><h4>Account</h4><ul style="display:flex;flex-direction:column;gap:10px;"><li><a href="login.html">Login / Signup</a></li><li><a href="track-order.html">Track Order</a></li></ul></div>
+      <div><h4>Contact</h4><ul style="display:flex;flex-direction:column;gap:10px;"><li><a href="contact.html">Get in touch</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 TerraBloom.</span><span>Made with real, seasonal ingredients.</span></div>
+  </div>
+</footer>
+<div id="toast-root"></div>
+<script src="js/main.js"></script>
+<script>
+  document.getElementById('contact-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    const btn = document.getElementById('send-btn');
+    btn.classList.add('loading'); btn.disabled = true;
+    setTimeout(()=>{
+      btn.classList.remove('loading'); btn.disabled = false;
+      document.getElementById('confirm-msg').style.display = 'block';
+      this.reset();
+      toast('Message sent successfully');
+    }, 1200);
+  });
+</script>
+</body>
+</html>

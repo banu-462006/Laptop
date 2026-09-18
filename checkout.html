@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — TerraBloom</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .steps{ display:flex; align-items:center; gap:0; margin-bottom:36px; }
+  .step{ display:flex; align-items:center; gap:10px; }
+  .step .num{ width:32px;height:32px;border-radius:50%;background:var(--cream-deep);color:var(--muted);display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Poppins';font-size:.85rem;transition:.3s; }
+  .step.active .num, .step.done .num{ background:var(--terracotta); color:#fff; }
+  .step .label{ font-size:.85rem; font-weight:600; color:var(--muted); }
+  .step.active .label, .step.done .label{ color:var(--forest); }
+  .step-line{ flex:1; height:2px; background:var(--cream-deep); margin:0 12px; }
+  .pay-option{ border:1.5px solid var(--cream-deep); border-radius:14px; padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:.2s; }
+  .pay-option.selected{ border-color:var(--sage); background:var(--sage-pale); }
+</style>
+</head>
+<body>
+<nav class="glass-nav"><div class="container"><div class="bar">
+  <a href="index.html" class="brand"><span class="dot"></span>TerraBloom</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li><li><a href="menu.html">Menu</a></li><li><a href="about.html">About</a></li>
+    <li><a href="reservation.html">Reserve</a></li><li><a href="contact.html">Contact</a></li><li><a href="track-order.html">Track Order</a></li>
+  </ul>
+  <div class="nav-actions"><a href="login.html" class="icon-btn">👤</a><a href="cart.html" class="icon-btn">🛒<span class="cart-count">0</span></a>
+  <button class="menu-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div>
+</div></div></nav>
+
+<header class="page-hero" style="padding-bottom:10px;">
+  <div class="container">
+    <div class="crumbs"><a href="index.html">Home</a> / <a href="cart.html">Cart</a> / Checkout</div>
+    <h1 style="font-size:2.2rem;">Checkout</h1>
+  </div>
+</header>
+
+<section class="section-tight" style="padding-top:10px;">
+  <div class="container">
+    <div class="steps">
+      <div class="step active" id="step1"><div class="num">1</div><div class="label">Delivery</div></div>
+      <div class="step-line"></div>
+      <div class="step" id="step2"><div class="num">2</div><div class="label">Payment</div></div>
+      <div class="step-line"></div>
+      <div class="step" id="step3"><div class="num">3</div><div class="label">Review</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:32px;align-items:flex-start;">
+      <div>
+        <!-- STAGE 1 -->
+        <div class="card" id="stage-1" style="padding:28px;">
+          <h4 style="margin-top:0;">Delivery details</h4>
+          <div class="grid-2">
+            <div class="field"><label>Full name</label><input id="f-name" type="text" placeholder="Jordan Lee"></div>
+            <div class="field"><label>Phone number</label><input id="f-phone" type="tel" placeholder="(555) 019-2044"></div>
+          </div>
+          <div class="field"><label>Delivery address</label><input id="f-address" type="text" placeholder="120 Willow Street, Apt 4B"></div>
+          <div class="grid-2">
+            <div class="field"><label>City</label><input id="f-city" type="text" placeholder="Portland"></div>
+            <div class="field"><label>ZIP code</label><input id="f-zip" type="text" placeholder="97201"></div>
+          </div>
+          <div class="field"><label>Delivery notes (optional)</label><textarea rows="2" placeholder="Leave at the front desk"></textarea></div>
+          <button class="btn btn-primary" id="to-step2">Continue to Payment →</button>
+        </div>
+
+        <!-- STAGE 2 -->
+        <div class="card" id="stage-2" style="padding:28px;display:none;">
+          <h4 style="margin-top:0;">Payment method</h4>
+          <div style="display:grid;gap:12px;">
+            <label class="pay-option selected"><input type="radio" name="pay" value="card" checked style="accent-color:var(--sage);">💳 Credit / Debit Card</label>
+            <label class="pay-option"><input type="radio" name="pay" value="upi" style="accent-color:var(--sage);">📱 UPI / Wallet</label>
+            <label class="pay-option"><input type="radio" name="pay" value="cod" style="accent-color:var(--sage);">💵 Cash on Delivery</label>
+          </div>
+          <div id="card-fields" style="margin-top:20px;">
+            <div class="field"><label>Card number</label><input type="text" placeholder="4242 4242 4242 4242"></div>
+            <div class="grid-2">
+              <div class="field"><label>Expiry</label><input type="text" placeholder="MM/YY"></div>
+              <div class="field"><label>CVV</label><input type="text" placeholder="123"></div>
+            </div>
+          </div>
+          <div class="flex gap-16" style="margin-top:10px;">
+            <button class="btn btn-outline" id="back-step1">← Back</button>
+            <button class="btn btn-primary" id="to-step3">Review Order →</button>
+          </div>
+        </div>
+
+        <!-- STAGE 3 -->
+        <div class="card" id="stage-3" style="padding:28px;display:none;">
+          <h4 style="margin-top:0;">Review your order</h4>
+          <div id="review-lines" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;"></div>
+          <p class="muted" style="font-size:.85rem;">Delivering to <span id="review-address"></span></p>
+          <div class="flex gap-16">
+            <button class="btn btn-outline" id="back-step2">← Back</button>
+            <button class="btn btn-primary" id="place-order"><span class="btn-label">Place Order — <span id="place-total">$0.00</span></span><span class="spinner"></span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:26px;position:sticky;top:100px;">
+        <h4 style="margin-top:0;">Order Summary</h4>
+        <div id="mini-lines" style="display:flex;flex-direction:column;gap:10px;font-size:.88rem;"></div>
+        <hr style="border:none;border-top:1px solid var(--cream-deep);margin:14px 0;">
+        <div class="flex between"><span class="muted">Subtotal</span><span id="c-subtotal">$0.00</span></div>
+        <div class="flex between" style="margin-top:8px;"><span class="muted">Delivery</span><span>$3.00</span></div>
+        <hr style="border:none;border-top:1px solid var(--cream-deep);margin:14px 0;">
+        <div class="flex between" style="font-weight:700;font-size:1.1rem;"><span>Total</span><span id="c-total">$0.00</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container"><div class="footer-bottom"><span>© 2026 TerraBloom.</span><span>Secure checkout, always.</span></div></div>
+</footer>
+<div id="toast-root"></div>
+<script src="js/main.js"></script>
+<script>
+  if(cartCount()===0){ location.href='cart.html'; }
+
+  function renderSummary(){
+    const lines = cartLines();
+    document.getElementById('mini-lines').innerHTML = lines.map(l=>`<div class="flex between"><span>${l.qty} × ${l.item.name}</span><span>$${(l.item.price*l.qty).toFixed(2)}</span></div>`).join('');
+    document.getElementById('review-lines').innerHTML = lines.map(l=>`<div class="flex between"><span>${l.qty} × ${l.item.name}</span><span>$${(l.item.price*l.qty).toFixed(2)}</span></div>`).join('');
+    const sub = cartSubtotal(); const total = sub+3;
+    document.getElementById('c-subtotal').textContent = `$${sub.toFixed(2)}`;
+    document.getElementById('c-total').textContent = `$${total.toFixed(2)}`;
+    document.getElementById('place-total').textContent = `$${total.toFixed(2)}`;
+  }
+  renderSummary();
+
+  function goStep(n){
+    [1,2,3].forEach(i=>{
+      document.getElementById('stage-'+i).style.display = i===n?'block':'none';
+      const s = document.getElementById('step'+i);
+      s.classList.toggle('active', i===n);
+      s.classList.toggle('done', i<n);
+    });
+    window.scrollTo({top:200,behavior:'smooth'});
+  }
+  document.getElementById('to-step2').addEventListener('click',()=>{
+    if(!document.getElementById('f-name').value || !document.getElementById('f-address').value){
+      toast('Please fill in your name and address','⚠'); return;
+    }
+    goStep(2);
+  });
+  document.getElementById('back-step1').addEventListener('click',()=>goStep(1));
+  document.getElementById('to-step3').addEventListener('click',()=>{ renderSummary(); goStep(3); });
+  document.getElementById('back-step2').addEventListener('click',()=>goStep(2));
+
+  document.querySelectorAll('input[name="pay"]').forEach(r=>r.addEventListener('change',()=>{
+    document.querySelectorAll('.pay-option').forEach(o=>o.classList.remove('selected'));
+    r.closest('.pay-option').classList.add('selected');
+    document.getElementById('card-fields').style.display = r.value==='card' ? 'block':'none';
+  }));
+
+  document.getElementById('place-order').addEventListener('click', function(){
+    this.classList.add('loading'); this.disabled = true;
+    setTimeout(()=>{
+      const orderId = 'TB-' + Math.floor(100000+Math.random()*900000);
+      const total = document.getElementById('c-total').textContent;
+      localStorage.setItem('terrabloom_last_order', JSON.stringify({orderId, total, placedAt: Date.now()}));
+      localStorage.setItem(CART_KEY, '[]');
+      location.href = 'order-success.html';
+    }, 1600);
+  });
+</script>
+</body>
+</html>

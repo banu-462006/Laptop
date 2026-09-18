@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Order — TerraBloom</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .track-line{ position:relative; padding-left:44px; }
+  .track-item{ position:relative; padding-bottom:36px; }
+  .track-item::before{ content:''; position:absolute; left:-32px; top:2px; width:16px;height:16px;border-radius:50%; background:var(--cream-deep); border:3px solid var(--cream-deep); transition:.4s; }
+  .track-item::after{ content:''; position:absolute; left:-25px; top:18px; width:2px; height:100%; background:var(--cream-deep); }
+  .track-item:last-child::after{ display:none; }
+  .track-item.done::before{ background:var(--sage); border-color:var(--sage-pale); }
+  .track-item.active::before{ background:var(--terracotta); border-color:#fbdcc9; animation:pulse 1.4s infinite; }
+  @keyframes pulse{ 0%,100%{box-shadow:0 0 0 0 rgba(226,112,58,.4);} 50%{box-shadow:0 0 0 6px rgba(226,112,58,0);} }
+</style>
+</head>
+<body>
+<nav class="glass-nav"><div class="container"><div class="bar">
+  <a href="index.html" class="brand"><span class="dot"></span>TerraBloom</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li><li><a href="menu.html">Menu</a></li><li><a href="about.html">About</a></li>
+    <li><a href="reservation.html">Reserve</a></li><li><a href="contact.html">Contact</a></li><li><a href="track-order.html" class="active">Track Order</a></li>
+  </ul>
+  <div class="nav-actions"><a href="login.html" class="icon-btn">👤</a><a href="cart.html" class="icon-btn">🛒<span class="cart-count">0</span></a>
+  <button class="menu-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div>
+</div></div></nav>
+
+<header class="page-hero" style="padding-bottom:20px;">
+  <div class="container"><span class="eyebrow">Live Status</span><h1>Track your order</h1></div>
+</header>
+
+<section class="section-tight" style="padding-top:10px;">
+  <div class="container" style="max-width:640px;">
+    <div class="card" style="padding:28px;margin-bottom:24px;">
+      <div class="field" style="margin-bottom:0;">
+        <label>Order ID</label>
+        <div class="flex gap-8"><input id="order-input" type="text" placeholder="e.g. TB-482913"><button class="btn btn-ghost" id="track-btn">Track</button></div>
+      </div>
+    </div>
+
+    <div class="card" id="track-result" style="padding:32px;">
+      <div class="flex between" style="margin-bottom:24px;">
+        <div><span class="muted" style="font-size:.8rem;">Order</span><h3 style="margin:0;" id="t-order-id">—</h3></div>
+        <div class="badge" id="t-eta">Arriving in 22 min</div>
+      </div>
+      <div class="track-line">
+        <div class="track-item done"><h4 style="margin:0;">Order Confirmed</h4><p class="muted mb-0" style="font-size:.85rem;">We've received your order.</p></div>
+        <div class="track-item done"><h4 style="margin:0;">Preparing Your Food</h4><p class="muted mb-0" style="font-size:.85rem;">Freshly assembled in our kitchen.</p></div>
+        <div class="track-item active"><h4 style="margin:0;">Out for Delivery</h4><p class="muted mb-0" style="font-size:.85rem;">Your rider is on the way.</p></div>
+        <div class="track-item"><h4 style="margin:0;">Delivered</h4><p class="muted mb-0" style="font-size:.85rem;">Enjoy your meal!</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container"><div class="footer-bottom"><span>© 2026 TerraBloom.</span><span>Made with real, seasonal ingredients.</span></div></div>
+</footer>
+<div id="toast-root"></div>
+<script src="js/main.js"></script>
+<script>
+  const last = JSON.parse(localStorage.getItem('terrabloom_last_order') || 'null');
+  document.getElementById('t-order-id').textContent = last ? last.orderId : 'TB-482913';
+  if(last) document.getElementById('order-input').value = last.orderId;
+
+  document.getElementById('track-btn').addEventListener('click', ()=>{
+    const val = document.getElementById('order-input').value.trim();
+    if(!val){ toast('Enter an order ID to track','⚠'); return; }
+    document.getElementById('t-order-id').textContent = val;
+    toast('Showing latest status for '+val);
+  });
+</script>
+</body>
+</html>

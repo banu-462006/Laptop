@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Corpus — NLP Q&A Companion</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2A41;
+    --ink-soft:#324459;
+    --paper:#EEF0EA;
+    --card:#FBFAF5;
+    --red:#B23A2E;
+    --red-soft:#D9C3BE;
+    --teal:#2F6F6D;
+    --teal-soft:#E1EBE9;
+    --gold:#C99A2E;
+    --line:#D8D9CE;
+    --shadow: 0 1px 0 rgba(27,42,65,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at top left, #F4F5EF 0%, var(--paper) 55%) fixed;
+    font-family:'IBM Plex Sans', sans-serif;
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+    padding:28px 16px;
+    min-height:100vh;
+  }
+  .app{
+    width:100%;
+    max-width:760px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 18px 40px -22px rgba(27,42,65,0.35), 0 2px 0 rgba(27,42,65,0.04);
+    display:flex;
+    flex-direction:column;
+    min-height:640px;
+    max-height:88vh;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    background:var(--ink);
+    color:#F1EEE3;
+    padding:22px 26px 18px;
+    position:relative;
+    flex-shrink:0;
+  }
+  header::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:3px;
+    background:repeating-linear-gradient(90deg, var(--gold) 0 18px, transparent 18px 26px);
+    opacity:.6;
+  }
+  .brand-row{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:26px;
+    letter-spacing:0.2px;
+    margin:0;
+  }
+  h1 span{color:var(--gold);}
+  .badge{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:#1B2A41;
+    background:#F1EEE3;
+    border-radius:20px;
+    padding:4px 10px;
+    white-space:nowrap;
+  }
+  .subtitle{
+    margin:6px 0 0;
+    font-size:13px;
+    color:#C9CCC0;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .subtitle b{color:#F1EEE3; font-weight:500;}
+
+  /* ---------- Chat window ---------- */
+  .chat{
+    flex:1;
+    overflow-y:auto;
+    padding:22px 24px;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    background-image: linear-gradient(var(--line) 1px, transparent 1px);
+    background-size: 100% 34px;
+    background-position: 0 8px;
+  }
+  .chat::-webkit-scrollbar{width:9px;}
+  .chat::-webkit-scrollbar-thumb{background:var(--line); border-radius:6px;}
+
+  .row{display:flex; gap:10px; max-width:100%;}
+  .row.user{justify-content:flex-end;}
+  .row.bot{justify-content:flex-start;}
+
+  .avatar{
+    width:32px; height:32px; border-radius:50%;
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px; font-weight:600;
+    border:1px solid var(--line);
+    margin-top:2px;
+  }
+  .avatar.bot{background:var(--teal-soft); color:var(--teal);}
+  .avatar.user{background:var(--ink); color:#F1EEE3;}
+
+  .bubble-wrap{max-width:74%; display:flex; flex-direction:column;}
+  .row.user .bubble-wrap{align-items:flex-end;}
+
+  .bubble{
+    padding:12px 15px;
+    font-size:14.5px;
+    line-height:1.55;
+    border-radius:4px 14px 14px 14px;
+    position:relative;
+  }
+  .row.user .bubble{
+    background:var(--ink);
+    color:#F1EEE3;
+    border-radius:14px 4px 14px 14px;
+  }
+  .row.bot .bubble{
+    background:#fff;
+    border:1px solid var(--line);
+    border-left:3px solid var(--red);
+    color:var(--ink);
+  }
+  .bubble code{
+    font-family:'IBM Plex Mono', monospace;
+    background:rgba(27,42,65,0.06);
+    padding:1px 5px;
+    border-radius:3px;
+    font-size:13px;
+  }
+  .row.user .bubble code{background:rgba(255,255,255,0.12);}
+
+  .tstamp{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    color:#8F9184;
+    margin-top:4px;
+    padding:0 3px;
+  }
+
+  .tag-strip{
+    display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;
+  }
+  .tag-chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    background:var(--teal-soft);
+    color:var(--teal);
+    border:1px dashed var(--teal);
+    border-radius:20px;
+    padding:2px 8px;
+  }
+
+  pre.code-block{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    line-height:1.5;
+    background:#152233;
+    color:#DCE7E6;
+    border-radius:8px;
+    padding:13px 14px;
+    overflow-x:auto;
+    margin:8px 0 2px;
+  }
+  pre.code-block .kw{color:#E7B75F;}
+  pre.code-block .st{color:#8FCB9B;}
+  pre.code-block .cm{color:#7C8CA6; font-style:italic;}
+
+  /* ---------- Sentiment gauge (signature element) ---------- */
+  .gauge-card{
+    margin-top:10px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px 14px 8px;
+  }
+  .gauge-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:#7A7C6F;
+    margin-bottom:2px;
+  }
+  .gauge-readout{
+    font-family:'Fraunces', serif;
+    font-size:15px;
+    font-weight:600;
+    margin-bottom:2px;
+  }
+
+  /* ---------- Typing indicator ---------- */
+  .typing-dots span{
+    display:inline-block; width:6px; height:6px; border-radius:50%;
+    background:var(--teal); margin-right:3px;
+    animation:bounce 1.1s infinite ease-in-out;
+  }
+  .typing-dots span:nth-child(2){animation-delay:.15s;}
+  .typing-dots span:nth-child(3){animation-delay:.3s;}
+  @keyframes bounce{0%,60%,100%{transform:translateY(0); opacity:.5;} 30%{transform:translateY(-5px); opacity:1;}}
+
+  /* ---------- Input area ---------- */
+  .input-bar{
+    display:flex; gap:10px;
+    padding:14px 20px;
+    border-top:1px solid var(--line);
+    background:var(--card);
+    flex-shrink:0;
+  }
+  .input-bar input{
+    flex:1;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14px;
+    padding:11px 14px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--ink);
+    outline:none;
+    transition:border-color .15s;
+  }
+  .input-bar input:focus{border-color:var(--teal);}
+  .send-btn{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    background:var(--ink);
+    color:#F1EEE3;
+    border:none;
+    border-radius:8px;
+    padding:0 20px;
+    cursor:pointer;
+    transition:transform .12s ease, background .15s ease;
+  }
+  .send-btn:hover{background:var(--ink-soft); transform:translateY(-1px);}
+  .send-btn:active{transform:translateY(0px) scale(.97);}
+
+  /* ---------- Toolbar ---------- */
+  .toolbar{
+    display:flex; gap:8px; flex-wrap:wrap;
+    padding:12px 20px 8px;
+    border-top:1px solid var(--line);
+    flex-shrink:0;
+  }
+  .tool-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:.02em;
+    display:flex; align-items:center; gap:6px;
+    background:#fff;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    padding:7px 12px;
+    border-radius:20px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .tool-btn:hover{
+    border-color:var(--teal);
+    color:var(--teal);
+    transform:translateY(-1px);
+    box-shadow:0 3px 8px -4px rgba(47,111,109,0.5);
+  }
+  .tool-btn .dot{width:6px; height:6px; border-radius:50%; background:var(--gold);}
+  .tool-btn.code .dot{background:var(--teal);}
+  .tool-btn.diagram .dot{background:#3B6B95;}
+  .tool-btn.sentiment .dot{background:var(--red);}
+
+  .footer-row{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:8px 20px 14px;
+  }
+  .clear-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:#9A5A52;
+    background:none;
+    border:none;
+    cursor:pointer;
+    text-decoration:underline dotted;
+    padding:2px 0;
+  }
+  .clear-btn:hover{color:var(--red);}
+  .footprint{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    color:#A5A79A;
+  }
+
+  @media (max-width:480px){
+    .bubble-wrap{max-width:88%;}
+    header{padding:18px 18px 14px;}
+    .chat{padding:16px;}
+    .toolbar{padding:10px 14px 6px;}
+    .input-bar{padding:12px 14px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div class="brand-row">
+      <h1>Corpus<span>.</span> <span style="font-weight:400; font-size:15px; color:#C9CCC0; font-family:'IBM Plex Mono',monospace;">NLP Q&amp;A</span></h1>
+      <span class="badge">study companion</span>
+    </div>
+    <p class="subtitle">Ask about <b>NLTK</b>, <b>sentiment analysis</b>, <b>tokenization</b>, or <b>word embeddings</b> — I'll annotate the answer.</p>
+  </header>
+
+  <div class="chat" id="chat"></div>
+
+  <div class="toolbar">
+    <button class="tool-btn code" onclick="handleTool('code')"><span class="dot"></span>Show example code</button>
+    <button class="tool-btn diagram" onclick="handleTool('diagram')"><span class="dot"></span>Explain with diagram</button>
+    <button class="tool-btn sentiment" onclick="handleTool('sentiment')"><span class="dot"></span>Sentiment demo</button>
+  </div>
+
+  <div class="input-bar">
+    <input id="msgInput" type="text" placeholder="Type your question…" onkeydown="if(event.key==='Enter')sendMessage()">
+    <button class="send-btn" onclick="sendMessage()">Send</button>
+  </div>
+
+  <div class="footer-row">
+    <button class="clear-btn" onclick="clearChat()">✂ clear chat</button>
+    <span class="footprint">tokens parsed in real time</span>
+  </div>
+</div>
+
+<script>
+const chatEl = document.getElementById('chat');
+const inputEl = document.getElementById('msgInput');
+let mode = 'qa'; // 'qa' or 'sentiment'
+let codeIdx = 0, diagIdx = 0;
+
+const KB = [
+  { keys:['tf-idf','tf idf','term frequency'],
+    tags:['TF-IDF','VECTORIZATION'],
+    ans:"TF-IDF stands for Term Frequency-Inverse Document Frequency. It's a score that reflects how important a word is to a document relative to a whole corpus — common words like <code>the</code> get discounted, rare-but-relevant words get boosted." },
+  { keys:['tokeniz'],
+    tags:['TOKENIZATION','NLTK'],
+    ans:"Tokenization splits raw text into smaller units — words, subwords, or sentences — so a model has discrete pieces to work with. In NLTK, <code>word_tokenize()</code> handles word-level splitting, and <code>sent_tokenize()</code> handles sentences." },
+  { keys:['stem','lemmat'],
+    tags:['MORPHOLOGY','NLTK'],
+    ans:"Stemming chops words down to a rough root using fixed rules (<code>running</code> → <code>run</code>, but sometimes <code>studies</code> → <code>studi</code>). Lemmatization is smarter — it uses vocabulary and grammar to return a real dictionary form, so <code>studies</code> → <code>study</code>." },
+  { keys:['stopword'],
+    tags:['PREPROCESSING','NLTK'],
+    ans:"Stopwords are very common words — <code>the</code>, <code>is</code>, <code>and</code> — that carry little topical meaning on their own and are often filtered out before analysis. NLTK ships a built-in stopword list per language via <code>nltk.corpus.stopwords</code>." },
+  { keys:['bag of words','bow'],
+    tags:['VECTORIZATION'],
+    ans:"Bag-of-Words represents a document as a vector of word counts, ignoring grammar and word order entirely — only frequency matters. It's simple and fast, but loses all context between words." },
+  { keys:['n-gram','ngram'],
+    tags:['LANGUAGE MODELING'],
+    ans:"An n-gram is a contiguous sequence of n tokens. Bigrams (n=2) and trigrams (n=3) capture a bit of local word order that bag-of-words throws away — useful for language models and simple sentiment cues like <code>not good</code>." },
+  { keys:['sentiment analysis','sentiment'],
+    tags:['SENTIMENT'],
+    ans:"Sentiment analysis estimates the emotional polarity of text — positive, negative, or neutral — and often an intensity score. Approaches range from lexicon lookups (matching words against a scored dictionary) to trained classifiers or transformer models. Try the <b>Sentiment Demo</b> button below to see it live." },
+  { keys:['word embedding','word2vec','glove','embeddings'],
+    tags:['EMBEDDINGS'],
+    ans:"Word embeddings map words to dense numeric vectors so that semantically similar words land close together in the vector space — <code>king</code> and <code>queen</code> end up nearby. Word2Vec learns these from context windows; GloVe learns them from global co-occurrence statistics." },
+  { keys:['cosine similarity','cosine'],
+    tags:['VECTOR MATH'],
+    ans:"Cosine similarity measures the angle between two vectors rather than their distance — it ranges from -1 to 1, where 1 means the vectors point the same direction. It's the standard way to compare word or document embeddings regardless of their length." },
+  { keys:['nltk'],
+    tags:['NLTK'],
+    ans:"NLTK (Natural Language Toolkit) is a Python library for building NLP pipelines — tokenizing, tagging parts of speech, stemming, parsing, and accessing sample corpora. It's a favorite for teaching because it's transparent about each processing step." },
+  { keys:['pos tag','part of speech'],
+    tags:['POS TAGGING','NLTK'],
+    ans:"POS tagging labels each token with its grammatical role — noun, verb, adjective, and so on. NLTK's <code>pos_tag()</code> uses a pretrained tagger, which is a first step toward parsing sentence structure or extracting named entities." },
+  { keys:['corpus'],
+    tags:['CORPUS LINGUISTICS'],
+    ans:"A corpus is simply a structured collection of text used for training or evaluating language tools — anything from a folder of tweets to the entire contents of Wikipedia. NLTK bundles several sample corpora for practice." }
+];
+
+const GREETING = ['hi','hello','hey','good morning','good afternoon'];
+
+const OUT_OF_SCOPE = "I specialize in NLP, NLTK, Sentiment Analysis, and Word Embeddings. Could you ask me something related to these areas?";
+
+const CODE_SNIPPETS = [
+{ label:'Tokenization with NLTK', code:
+`<span class="kw">import</span> nltk
+<span class="kw">from</span> nltk.tokenize <span class="kw">import</span> word_tokenize
+
+nltk.download(<span class="st">'punkt'</span>)
+text = <span class="st">"NLP turns raw text into structured data."</span>
+tokens = word_tokenize(text)
+<span class="kw">print</span>(tokens)
+<span class="cm"># ['NLP', 'turns', 'raw', 'text', ...]</span>` },
+{ label:'Removing stopwords', code:
+`<span class="kw">from</span> nltk.corpus <span class="kw">import</span> stopwords
+<span class="kw">from</span> nltk.tokenize <span class="kw">import</span> word_tokenize
+
+stop = <span class="kw">set</span>(stopwords.words(<span class="st">'english'</span>))
+tokens = word_tokenize(<span class="st">"This is a simple example"</span>)
+clean = [w <span class="kw">for</span> w <span class="kw">in</span> tokens <span class="kw">if</span> w.lower() <span class="kw">not</span> <span class="kw">in</span> stop]
+<span class="kw">print</span>(clean)
+<span class="cm"># ['simple', 'example']</span>` },
+{ label:'Simple sentiment scoring', code:
+`positive = {<span class="st">"good"</span>, <span class="st">"great"</span>, <span class="st">"love"</span>}
+negative = {<span class="st">"bad"</span>, <span class="st">"terrible"</span>, <span class="st">"hate"</span>}
+
+<span class="kw">def</span> polarity(text):
+    words = text.lower().split()
+    score = <span class="kw">sum</span>(w <span class="kw">in</span> positive <span class="kw">for</span> w <span class="kw">in</span> words)
+    score -= <span class="kw">sum</span>(w <span class="kw">in</span> negative <span class="kw">for</span> w <span class="kw">in</span> words)
+    <span class="kw">return</span> score
+
+<span class="kw">print</span>(polarity(<span class="st">"I love this, it's great"</span>))  <span class="cm"># 2</span>` },
+{ label:'Cosine similarity of embeddings', code:
+`<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> cosine_sim(a, b):
+    <span class="kw">return</span> np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+king  = np.array([<span class="cm">...</span>])
+queen = np.array([<span class="cm">...</span>])
+<span class="kw">print</span>(cosine_sim(king, queen))
+<span class="cm"># closer to 1.0 = more semantically similar</span>` }
+];
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function now(){
+  const d = new Date();
+  let h = d.getHours(), m = d.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12; if(h === 0) h = 12;
+  return `${h}:${m.toString().padStart(2,'0')} ${ampm}`;
+}
+
+function scrollBottom(){ chatEl.scrollTop = chatEl.scrollHeight; }
+
+function addRow(sender, innerHTML, extraClass=''){
+  const row = document.createElement('div');
+  row.className = `row ${sender}`;
+  const avatar = sender === 'user'
+    ? `<div class="avatar user">U</div>`
+    : `<div class="avatar bot">C</div>`;
+  const bubbleHTML = `
+    <div class="bubble-wrap">
+      <div class="bubble ${extraClass}">${innerHTML}</div>
+      <div class="tstamp">${now()}</div>
+    </div>`;
+  row.innerHTML = sender === 'user' ? bubbleHTML + avatar : avatar + bubbleHTML;
+  chatEl.appendChild(row);
+  scrollBottom();
+  return row;
+}
+
+function botTagged(text, tags){
+  const chips = tags.map(t=>`<span class="tag-chip">${t}</span>`).join('');
+  return addRow('bot', `<div>${text}</div><div class="tag-strip">${chips}</div>`);
+}
+
+function showTyping(){
+  const row = document.createElement('div');
+  row.className = 'row bot';
+  row.id = 'typingRow';
+  row.innerHTML = `<div class="avatar bot">C</div><div class="bubble-wrap"><div class="bubble typing-dots"><span></span><span></span><span></span></div></div>`;
+  chatEl.appendChild(row);
+  scrollBottom();
+}
+function removeTyping(){
+  const t = document.getElementById('typingRow');
+  if(t) t.remove();
+}
+
+function findAnswer(text){
+  const lower = text.toLowerCase();
+  for(const item of KB){
+    if(item.keys.some(k => lower.includes(k))) return item;
+  }
+  return null;
+}
+
+function sendMessage(){
+  const text = inputEl.value.trim();
+  if(!text) return;
+  addRow('user', esc(text));
+  inputEl.value = '';
+
+  showTyping();
+  setTimeout(()=>{
+    removeTyping();
+    if(mode === 'sentiment'){
+      runSentimentDemo(text);
+      mode = 'qa';
+      return;
+    }
+    const lower = text.toLowerCase();
+    if(GREETING.some(g => lower.includes(g))){
+      botTagged("Hello! I'm ready when you are — ask me about NLTK, tokenization, sentiment analysis, or word embeddings.", ['GREETING']);
+      return;
+    }
+    const match = findAnswer(text);
+    if(match){
+      botTagged(match.ans, match.tags);
+    } else {
+      addRow('bot', OUT_OF_SCOPE);
+    }
+  }, 650);
+}
+
+function handleTool(kind){
+  showTyping();
+  setTimeout(()=>{
+    removeTyping();
+    if(kind === 'code'){
+      const snip = CODE_SNIPPETS[codeIdx % CODE_SNIPPETS.length];
+      codeIdx++;
+      botTagged(
+        `<b>${esc(snip.label)}</b><pre class="code-block">${snip.code}</pre>`,
+        ['CODE SAMPLE','PYTHON']
+      );
+    } else if(kind === 'diagram'){
+      renderDiagram();
+    } else if(kind === 'sentiment'){
+      mode = 'sentiment';
+      botTagged("Type a sentence below and I'll break down its sentiment — polarity and intensity.", ['SENTIMENT DEMO']);
+    }
+  }, 500);
+}
+
+function renderDiagram(){
+  const svg = `
+  <svg viewBox="0 0 560 120" width="100%" style="max-width:480px; display:block; margin-top:6px;">
+    <defs>
+      <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M1 1L9 5L1 9" fill="none" stroke="#2F6F6D" stroke-width="1.6"/>
+      </marker>
+    </defs>
+    ${['Raw text','Tokenize','Remove\\nstopwords','Stem /\\nlemmatize','Vectorize\\n(TF-IDF)'].map((label,i)=>{
+      const x = 10 + i*112;
+      const lines = label.split('\\\\n');
+      return `
+      <rect x="${x}" y="30" width="98" height="60" rx="8" fill="${i===0?'#EEF0EA':'#fff'}" stroke="#2F6F6D" stroke-width="1"/>
+      ${lines.map((l,li)=>`<text x="${x+49}" y="${58 + li*14}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#1B2A41">${l}</text>`).join('')}
+      ${i<4 ? `<line x1="${x+98}" y1="60" x2="${x+112}" y2="60" stroke="#2F6F6D" stroke-width="1.5" marker-end="url(#arrowhead)"/>` : ''}
+      `;
+    }).join('')}
+  </svg>`;
+  botTagged(
+    `<div>Here's the typical preprocessing pipeline before a model ever sees a numeric vector:</div>${svg}`,
+    ['PIPELINE','DIAGRAM']
+  );
+}
+
+const POS_WORDS = {good:1, great:1.5, excellent:1.7, amazing:1.6, love:1.8, wonderful:1.5, fantastic:1.6, happy:1.3, best:1.6, awesome:1.6, nice:1, positive:1.2, beautiful:1.3, brilliant:1.6, perfect:1.7, enjoy:1.2, glad:1.1, delight:1.4, superb:1.6, delightful:1.4};
+const NEG_WORDS = {bad:1, terrible:1.7, awful:1.6, hate:1.8, worst:1.8, horrible:1.6, sad:1.2, poor:1.1, negative:1.2, disappointing:1.4, angry:1.4, ugly:1.1, disgusting:1.6, boring:1, annoying:1.2, wrong:1, fail:1.2, worse:1.3};
+
+function runSentimentDemo(text){
+  const words = text.toLowerCase().replace(/[^a-z0-9'\s]/g,' ').split(/\s+/).filter(Boolean);
+  let score = 0, hits = [];
+  words.forEach(w=>{
+    if(POS_WORDS[w] !== undefined){ score += POS_WORDS[w]; hits.push({w, sign:'+'}); }
+    else if(NEG_WORDS[w] !== undefined){ score -= NEG_WORDS[w]; hits.push({w, sign:'-'}); }
+  });
+  const norm = Math.max(-2, Math.min(2, score)); // clamp
+  const pct = ((norm + 2) / 4) * 100; // 0..100
+  let label, color;
+  if(norm > 0.8){label='Positive'; color='#2F6F6D';}
+  else if(norm > 0.15){label='Slightly positive'; color='#4E8C74';}
+  else if(norm < -0.8){label='Negative'; color='#B23A2E';}
+  else if(norm < -0.15){label='Slightly negative'; color='#B2705F';}
+  else {label='Neutral'; color='#8F9184';}
+
+  const chips = hits.length
+    ? hits.map(h=>`<span class="tag-chip" style="border-color:${h.sign==='+'?'#2F6F6D':'#B23A2E'}; color:${h.sign==='+'?'#2F6F6D':'#B23A2E'};">${h.sign} ${esc(h.w)}</span>`).join('')
+    : `<span class="tag-chip">no strong sentiment words detected</span>`;
+
+  const gauge = `
+  <svg viewBox="0 0 220 120" width="200" height="110" style="display:block; margin:4px auto 0;">
+    <path d="M20 100 A80 80 0 0 1 200 100" fill="none" stroke="#D8D9CE" stroke-width="14" stroke-linecap="round"/>
+    <path d="M20 100 A80 80 0 0 1 200 100" fill="none" stroke="${color}" stroke-width="14" stroke-linecap="round"
+      stroke-dasharray="251.2" stroke-dashoffset="${251.2 - (pct/100)*251.2}"/>
+    ${(()=>{
+      const angle = Math.PI - (pct/100)*Math.PI;
+      const nx = 110 + 68*Math.cos(angle);
+      const ny = 100 - 68*Math.sin(angle);
+      return `<line x1="110" y1="100" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#1B2A41" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="110" cy="100" r="5" fill="#1B2A41"/>`;
+    })()}
+    <text x="12" y="115" font-family="IBM Plex Mono, monospace" font-size="9" fill="#8F9184">neg</text>
+    <text x="188" y="115" font-family="IBM Plex Mono, monospace" font-size="9" fill="#8F9184">pos</text>
+  </svg>`;
+
+  const html = `
+    <div class="gauge-card">
+      <div class="gauge-label">Sentiment reading</div>
+      <div class="gauge-readout" style="color:${color};">${label} <span style="font-weight:400; font-size:12px; color:#7A7C6F; font-family:'IBM Plex Mono', monospace;">(score ${norm.toFixed(2)})</span></div>
+      ${gauge}
+      <div class="tag-strip" style="margin-top:6px;">${chips}</div>
+    </div>`;
+  botTagged(`Analyzed: “${esc(text)}”` + html, ['SENTIMENT DEMO']);
+}
+
+function clearChat(){
+  chatEl.innerHTML = '';
+  mode = 'qa';
+  seedChat();
+}
+
+function seedChat(){
+  botTagged("Hi! I'm Corpus — ask me anything about NLP, NLTK, sentiment analysis, or word embeddings.", ['WELCOME']);
+}
+
+seedChat();
+</script>
+</body>
+</html>

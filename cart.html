@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Cart — TerraBloom</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .cart-line{ display:grid; grid-template-columns:80px 1fr auto auto auto; gap:18px; align-items:center; padding:18px; transition: transform .35s var(--ease), opacity .35s var(--ease), max-height .35s var(--ease); }
+  .cart-line.removing{ transform: translateX(120%); opacity:0; }
+  .qty-box{ display:flex; align-items:center; border:1.5px solid var(--cream-deep); border-radius:999px; overflow:hidden; }
+  .qty-box button{ width:32px;height:32px;border:none;background:#fff;cursor:pointer;font-size:1rem; }
+  .qty-box button:hover{ background:var(--sage-pale); }
+  .qty-box span{ width:30px; text-align:center; font-weight:600; font-family:'Poppins'; }
+  #summary-total{ transition: color .3s var(--ease); }
+</style>
+</head>
+<body>
+<nav class="glass-nav"><div class="container"><div class="bar">
+  <a href="index.html" class="brand"><span class="dot"></span>TerraBloom</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li><li><a href="menu.html">Menu</a></li><li><a href="about.html">About</a></li>
+    <li><a href="reservation.html">Reserve</a></li><li><a href="contact.html">Contact</a></li><li><a href="track-order.html">Track Order</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="login.html" class="icon-btn">👤</a>
+    <a href="cart.html" class="icon-btn">🛒<span class="cart-count">0</span></a>
+    <button class="menu-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</div></div></nav>
+
+<header class="page-hero" style="padding-bottom:24px;">
+  <div class="container">
+    <div class="crumbs"><a href="index.html">Home</a> / <a href="menu.html">Menu</a> / Cart</div>
+    <h1 style="font-size:2.2rem;">Your Cart</h1>
+  </div>
+</header>
+
+<section class="section-tight" style="padding-top:0;">
+  <div class="container" style="display:grid;grid-template-columns:1.6fr 1fr;gap:32px;align-items:flex-start;">
+    <div id="cart-list" class="card" style="padding:8px;"></div>
+
+    <div class="card" style="padding:26px;position:sticky;top:100px;">
+      <h4 style="margin-top:0;">Order Summary</h4>
+      <div class="flex between" style="margin:10px 0;"><span class="muted">Subtotal</span><span id="s-subtotal">$0.00</span></div>
+      <div class="flex between" style="margin:10px 0;"><span class="muted">Delivery fee</span><span id="s-delivery">$3.00</span></div>
+      <div class="flex between" style="margin:10px 0;" id="discount-row" hidden><span class="muted">Discount</span><span id="s-discount" style="color:var(--terracotta);">-$0.00</span></div>
+      <div class="field" style="margin-top:16px;">
+        <label>Coupon code</label>
+        <div class="flex gap-8"><input id="coupon-input" type="text" placeholder="Try BLOOM20"><button id="apply-coupon" class="btn btn-ghost">Apply</button></div>
+        <div class="hint" id="coupon-msg"></div>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--cream-deep);margin:16px 0;">
+      <div class="flex between" style="font-size:1.2rem;font-weight:700;font-family:'Poppins';"><span>Total</span><span id="summary-total">$0.00</span></div>
+      <a href="checkout.html" class="btn btn-primary btn-block" style="margin-top:22px;" id="checkout-btn">Proceed to Checkout →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div><div class="brand" style="color:#fff;margin-bottom:12px;"><span class="dot"></span>TerraBloom</div><p style="color:var(--sage-pale);opacity:.8;font-size:.9rem;">Slow food, grown with intention.</p></div>
+      <div><h4>Explore</h4><ul style="display:flex;flex-direction:column;gap:10px;"><li><a href="menu.html">Menu</a></li><li><a href="about.html">About Us</a></li><li><a href="reservation.html">Reservation</a></li></ul></div>
+      <div><h4>Account</h4><ul style="display:flex;flex-direction:column;gap:10px;"><li><a href="login.html">Login / Signup</a></li><li><a href="track-order.html">Track Order</a></li></ul></div>
+      <div><h4>Contact</h4><ul style="display:flex;flex-direction:column;gap:10px;"><li><a href="contact.html">Get in touch</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 TerraBloom.</span><span>Made with real, seasonal ingredients.</span></div>
+  </div>
+</footer>
+<div id="toast-root"></div>
+<script src="js/main.js"></script>
+<script>
+  let coupon = JSON.parse(sessionStorage.getItem('tb_coupon')||'null');
+
+  function render(){
+    const lines = cartLines();
+    const list = document.getElementById('cart-list');
+    if(!lines.length){
+      list.innerHTML = `<div class="text-center" style="padding:60px 20px;">
+        <div style="font-size:2.4rem;">🛒</div>
+        <h3>Your cart is empty</h3>
+        <p class="muted">Looks like you haven't added any dishes yet.</p>
+        <a href="menu.html" class="btn btn-primary">Browse Menu</a>
+      </div>`;
+    } else {
+      list.innerHTML = lines.map(l=>`
+        <div class="cart-line" data-id="${l.id}">
+          <img src="${l.item.img}" style="width:70px;height:70px;object-fit:cover;border-radius:14px;">
+          <div><h4 style="margin:0 0 4px;">${l.item.name}</h4><span class="muted" style="font-size:.85rem;">$${l.item.price.toFixed(2)} each</span></div>
+          <div class="qty-box">
+            <button class="qty-dec">−</button><span>${l.qty}</span><button class="qty-inc">+</button>
+          </div>
+          <strong>$${(l.item.price*l.qty).toFixed(2)}</strong>
+          <button class="icon-btn remove-btn" title="Remove">✕</button>
+        </div>`).join('');
+    }
+
+    document.querySelectorAll('.qty-inc').forEach(b=>b.addEventListener('click',e=>{
+      const id = e.target.closest('.cart-line').dataset.id;
+      const l = getCart().find(x=>x.id===id); updateQty(id, l.qty+1); render();
+    }));
+    document.querySelectorAll('.qty-dec').forEach(b=>b.addEventListener('click',e=>{
+      const line = e.target.closest('.cart-line'); const id = line.dataset.id;
+      const l = getCart().find(x=>x.id===id);
+      if(l.qty<=1){ animateRemove(line,id); } else { updateQty(id, l.qty-1); render(); }
+    }));
+    document.querySelectorAll('.remove-btn').forEach(b=>b.addEventListener('click',e=>{
+      const line = e.target.closest('.cart-line'); animateRemove(line, line.dataset.id);
+    }));
+
+    updateSummary();
+  }
+
+  function animateRemove(line,id){
+    line.classList.add('removing');
+    setTimeout(()=>{ removeFromCart(id); render(); toast('Item removed from cart','✕'); }, 350);
+  }
+
+  function updateSummary(){
+    const subtotal = cartSubtotal();
+    const delivery = subtotal>0 ? 3 : 0;
+    let discount = 0;
+    if(coupon==='BLOOM20') discount = subtotal*0.2;
+    document.getElementById('s-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+    document.getElementById('s-delivery').textContent = `$${delivery.toFixed(2)}`;
+    document.getElementById('discount-row').hidden = discount===0;
+    document.getElementById('s-discount').textContent = `-$${discount.toFixed(2)}`;
+    document.getElementById('summary-total').textContent = `$${Math.max(0,subtotal+delivery-discount).toFixed(2)}`;
+    document.getElementById('checkout-btn').style.pointerEvents = subtotal>0 ? 'auto' : 'none';
+    document.getElementById('checkout-btn').style.opacity = subtotal>0 ? '1' : '.5';
+  }
+
+  document.getElementById('apply-coupon').addEventListener('click', ()=>{
+    const val = document.getElementById('coupon-input').value.trim().toUpperCase();
+    const msg = document.getElementById('coupon-msg');
+    if(val==='BLOOM20'){ coupon=val; sessionStorage.setItem('tb_coupon', JSON.stringify(val)); msg.style.color='var(--sage)'; msg.textContent='20% discount applied!'; }
+    else { msg.style.color='#D64545'; msg.textContent='Invalid or expired code.'; }
+    updateSummary();
+  });
+
+  render();
+</script>
+</body>
+</html>

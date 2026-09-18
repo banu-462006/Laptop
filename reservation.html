@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reserve a Table — TerraBloom</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .time-slot{ border:1.5px solid var(--cream-deep); border-radius:12px; padding:10px; text-align:center; cursor:pointer; font-family:'Poppins'; font-size:.85rem; font-weight:500; transition:.2s; }
+  .time-slot.selected{ background:var(--terracotta); color:#fff; border-color:var(--terracotta); }
+  .party-btn{ width:40px;height:40px;border-radius:50%;border:1.5px solid var(--cream-deep);background:#fff;cursor:pointer;font-size:1rem; }
+  .party-btn.selected{ background:var(--sage); border-color:var(--sage); color:#fff; }
+</style>
+</head>
+<body>
+<nav class="glass-nav"><div class="container"><div class="bar">
+  <a href="index.html" class="brand"><span class="dot"></span>TerraBloom</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li><li><a href="menu.html">Menu</a></li><li><a href="about.html">About</a></li>
+    <li><a href="reservation.html" class="active">Reserve</a></li><li><a href="contact.html">Contact</a></li><li><a href="track-order.html">Track Order</a></li>
+  </ul>
+  <div class="nav-actions"><a href="login.html" class="icon-btn">👤</a><a href="cart.html" class="icon-btn">🛒<span class="cart-count">0</span></a>
+  <button class="menu-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div>
+</div></div></nav>
+
+<header class="page-hero" style="padding-bottom:10px;">
+  <div class="container"><span class="eyebrow">Dine With Us</span><h1>Reserve a table</h1><p class="muted">Join us at our flagship kitchen on Willow Street.</p></div>
+</header>
+
+<section class="section-tight" style="padding-top:10px;">
+  <div class="container" style="display:grid;grid-template-columns:1fr 1fr;gap:40px;">
+    <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=700&q=80" class="card reveal" style="border-radius:32px;height:100%;object-fit:cover;" alt="Restaurant interior">
+
+    <div class="card" style="padding:30px;">
+      <h4 style="margin-top:0;">Party size</h4>
+      <div class="flex gap-8" id="party-group" style="margin-bottom:22px;">
+        <button class="party-btn" data-n="1">1</button>
+        <button class="party-btn selected" data-n="2">2</button>
+        <button class="party-btn" data-n="3">3</button>
+        <button class="party-btn" data-n="4">4</button>
+        <button class="party-btn" data-n="5">5+</button>
+      </div>
+
+      <div class="grid-2">
+        <div class="field"><label>Date</label><input type="date" id="r-date"></div>
+        <div class="field"><label>Name</label><input type="text" id="r-name" placeholder="Jordan Lee"></div>
+      </div>
+
+      <h4>Available times</h4>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px;" id="time-group"></div>
+
+      <div class="field"><label>Phone number</label><input type="tel" id="r-phone" placeholder="(555) 019-2044"></div>
+      <div class="field"><label>Special requests (optional)</label><textarea rows="2" placeholder="Window seat, allergies, celebration…"></textarea></div>
+
+      <button class="btn btn-primary btn-block" id="r-submit"><span class="btn-label">Confirm Reservation</span><span class="spinner"></span></button>
+      <p id="r-confirm" style="display:none;text-align:center;color:var(--sage);font-weight:600;margin-top:14px;">✓ Table reserved! A confirmation text is on its way.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container"><div class="footer-bottom"><span>© 2026 TerraBloom.</span><span>Made with real, seasonal ingredients.</span></div></div>
+</footer>
+<div id="toast-root"></div>
+<script src="js/main.js"></script>
+<script>
+  document.getElementById('r-date').valueAsDate = new Date();
+
+  document.querySelectorAll('.party-btn').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('.party-btn').forEach(x=>x.classList.remove('selected'));
+    b.classList.add('selected');
+  }));
+
+  const slots = ['5:00 PM','5:30 PM','6:00 PM','6:30 PM','7:00 PM','7:30 PM','8:00 PM','8:30 PM'];
+  const timeGroup = document.getElementById('time-group');
+  timeGroup.innerHTML = slots.map((t,i)=>`<div class="time-slot ${i===2?'selected':''}" data-t="${t}">${t}</div>`).join('');
+  timeGroup.querySelectorAll('.time-slot').forEach(el=>el.addEventListener('click',()=>{
+    timeGroup.querySelectorAll('.time-slot').forEach(x=>x.classList.remove('selected'));
+    el.classList.add('selected');
+  }));
+
+  document.getElementById('r-submit').addEventListener('click', function(){
+    if(!document.getElementById('r-name').value){ toast('Please enter your name','⚠'); return; }
+    this.classList.add('loading'); this.disabled = true;
+    setTimeout(()=>{
+      this.classList.remove('loading'); this.disabled = false;
+      document.getElementById('r-confirm').style.display = 'block';
+      toast('Reservation confirmed 🌿');
+    }, 1300);
+  });
+</script>
+</body>
+</html>

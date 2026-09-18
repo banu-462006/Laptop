@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — TerraBloom</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .auth-tabs{ display:flex; background:var(--cream-deep); border-radius:999px; padding:5px; margin-bottom:26px; }
+  .auth-tabs button{ flex:1; border:none; background:transparent; padding:11px; border-radius:999px; font-family:'Poppins'; font-weight:600; cursor:pointer; color:var(--muted); transition:.25s; }
+  .auth-tabs button.active{ background:#fff; color:var(--forest); box-shadow:var(--shadow-soft); }
+</style>
+</head>
+<body>
+<nav class="glass-nav"><div class="container"><div class="bar">
+  <a href="index.html" class="brand"><span class="dot"></span>TerraBloom</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li><li><a href="menu.html">Menu</a></li><li><a href="about.html">About</a></li>
+    <li><a href="reservation.html">Reserve</a></li><li><a href="contact.html">Contact</a></li><li><a href="track-order.html">Track Order</a></li>
+  </ul>
+  <div class="nav-actions"><a href="cart.html" class="icon-btn">🛒<span class="cart-count">0</span></a>
+  <button class="menu-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div>
+</div></div></nav>
+
+<section style="padding:70px 0;">
+  <div class="container" style="max-width:440px;">
+    <div class="blob blob-sage" style="width:220px;height:220px;top:60px;left:-80px;"></div>
+    <div class="card" style="padding:36px;position:relative;z-index:1;">
+      <div class="text-center" style="margin-bottom:22px;"><span class="eyebrow">Welcome</span><h2 style="margin:0;">Your TerraBloom account</h2></div>
+      <div class="auth-tabs">
+        <button class="active" id="tab-login">Log In</button>
+        <button id="tab-signup">Sign Up</button>
+      </div>
+
+      <form id="login-form">
+        <div class="field"><label>Email</label><input type="email" required placeholder="you@example.com"></div>
+        <div class="field"><label>Password</label><input type="password" required placeholder="••••••••"></div>
+        <div class="flex between" style="margin-bottom:18px;"><label class="flex gap-8" style="font-size:.85rem;"><input type="checkbox">Remember me</label><a href="#" style="font-size:.85rem;color:var(--terracotta);">Forgot password?</a></div>
+        <button type="submit" class="btn btn-primary btn-block"><span class="btn-label">Log In</span><span class="spinner"></span></button>
+      </form>
+
+      <form id="signup-form" style="display:none;">
+        <div class="field"><label>Full name</label><input type="text" required placeholder="Jordan Lee"></div>
+        <div class="field"><label>Email</label><input type="email" required placeholder="you@example.com"></div>
+        <div class="field"><label>Password</label><input type="password" required placeholder="Min. 8 characters"></div>
+        <button type="submit" class="btn btn-primary btn-block"><span class="btn-label">Create Account</span><span class="spinner"></span></button>
+      </form>
+
+      <p class="text-center muted" style="font-size:.8rem;margin-top:18px;">By continuing you agree to our Terms and Privacy Policy.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container"><div class="footer-bottom"><span>© 2026 TerraBloom.</span><span>Made with real, seasonal ingredients.</span></div></div>
+</footer>
+<div id="toast-root"></div>
+<script src="js/main.js"></script>
+<script>
+  const tabLogin = document.getElementById('tab-login'), tabSignup = document.getElementById('tab-signup');
+  const formLogin = document.getElementById('login-form'), formSignup = document.getElementById('signup-form');
+  tabLogin.addEventListener('click',()=>{ tabLogin.classList.add('active'); tabSignup.classList.remove('active'); formLogin.style.display='block'; formSignup.style.display='none'; });
+  tabSignup.addEventListener('click',()=>{ tabSignup.classList.add('active'); tabLogin.classList.remove('active'); formSignup.style.display='block'; formLogin.style.display='none'; });
+
+  [formLogin, formSignup].forEach(f=>f.addEventListener('submit', function(e){
+    e.preventDefault();
+    const btn = this.querySelector('button[type="submit"]');
+    btn.classList.add('loading'); btn.disabled = true;
+    setTimeout(()=>{ location.href='index.html'; }, 1200);
+  }));
+</script>
+</body>
+</html>

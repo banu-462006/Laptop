@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmed — TerraBloom</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .check-wrap{ width:110px;height:110px;border-radius:50%;background:var(--sage-pale);display:flex;align-items:center;justify-content:center;margin:0 auto 24px; }
+  .checkmark{ width:60px;height:60px; }
+  .checkmark circle{ stroke:var(--sage); stroke-width:3; fill:none; stroke-dasharray:166; stroke-dashoffset:166; animation: draw 0.6s var(--ease) forwards; }
+  .checkmark path{ stroke:var(--sage); stroke-width:4; fill:none; stroke-dasharray:48; stroke-dashoffset:48; animation: draw 0.4s var(--ease) .6s forwards; stroke-linecap:round; stroke-linejoin:round; }
+  @keyframes draw{ to{ stroke-dashoffset:0; } }
+  .confetti{ position:fixed; top:-10px; width:10px;height:16px; opacity:.9; animation: fall linear forwards; z-index:50; }
+  @keyframes fall{ to{ transform: translateY(105vh) rotate(540deg); opacity:0; } }
+</style>
+</head>
+<body>
+<nav class="glass-nav"><div class="container"><div class="bar">
+  <a href="index.html" class="brand"><span class="dot"></span>TerraBloom</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li><li><a href="menu.html">Menu</a></li><li><a href="about.html">About</a></li>
+    <li><a href="reservation.html">Reserve</a></li><li><a href="contact.html">Contact</a></li><li><a href="track-order.html">Track Order</a></li>
+  </ul>
+  <div class="nav-actions"><a href="login.html" class="icon-btn">👤</a><a href="cart.html" class="icon-btn">🛒<span class="cart-count">0</span></a>
+  <button class="menu-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div>
+</div></div></nav>
+
+<section style="padding:80px 0;">
+  <div class="container text-center" style="max-width:520px;">
+    <div class="check-wrap">
+      <svg class="checkmark" viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="M14 27l7 7 17-17"/></svg>
+    </div>
+    <span class="eyebrow">Order Confirmed</span>
+    <h1>Your bowl is on its way</h1>
+    <p class="muted">Thank you! We've started preparing your order fresh — you'll get a text when it's out for delivery.</p>
+
+    <div class="card" style="padding:26px;margin:28px 0;text-align:left;">
+      <div class="flex between" style="margin-bottom:12px;"><span class="muted">Order ID</span><strong id="order-id">—</strong></div>
+      <div class="flex between" style="margin-bottom:12px;"><span class="muted">Total paid</span><strong id="order-total">—</strong></div>
+      <div class="flex between"><span class="muted">Estimated delivery</span><strong id="order-eta">25–35 min</strong></div>
+    </div>
+
+    <div class="flex gap-16 center">
+      <a href="track-order.html" class="btn btn-primary">Track Order →</a>
+      <a href="menu.html" class="btn btn-outline">Order More</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container"><div class="footer-bottom"><span>© 2026 TerraBloom.</span><span>Bon appétit 🌿</span></div></div>
+</footer>
+<div id="toast-root"></div>
+<script src="js/main.js"></script>
+<script>
+  const last = JSON.parse(localStorage.getItem('terrabloom_last_order') || 'null');
+  document.getElementById('order-id').textContent = last ? last.orderId : 'TB-000000';
+  document.getElementById('order-total').textContent = last ? last.total : '$0.00';
+
+  // Confetti burst
+  const colors = ['#E2703A','#7C9473','#D9A441','#23331F'];
+  for(let i=0;i<70;i++){
+    const c = document.createElement('div');
+    c.className='confetti';
+    c.style.left = Math.random()*100+'vw';
+    c.style.background = colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDuration = (2.5+Math.random()*2)+'s';
+    c.style.animationDelay = (Math.random()*0.6)+'s';
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 5000);
+  }
+</script>
+</body>
+</html>
